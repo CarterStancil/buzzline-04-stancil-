@@ -43,7 +43,8 @@ logger.info(f"Data file: {DATA_FILE}")
 # Set up data structures
 #####################################
 
-author_counts = defaultdict(int)
+tracked_words = ["app", "movie", "meme", "story", "trick"]
+word_counts = defaultdict(int)
 
 #####################################
 # Set up live visuals
@@ -59,36 +60,22 @@ plt.ion()  # Turn on interactive mode for live updates
 
 
 def update_chart():
-    """Update the live chart with the latest author counts."""
-    # Clear the previous chart
+    """Update the live chart with the latest word counts."""
     ax.clear()
 
-    # Get the authors and counts from the dictionary
-    authors_list = list(author_counts.keys())
-    counts_list = list(author_counts.values())
+    words_list = list(word_counts.keys())
+    counts_list = list(word_counts.values())
 
-    # Create a bar chart using the bar() method.
-    # Pass in the x list, the y list, and the color
-    ax.bar(authors_list, counts_list, color="green")
+    ax.bar(words_list, counts_list, color="green")
 
-    # Use the built-in axes methods to set the labels and title
-    ax.set_xlabel("Authors")
-    ax.set_ylabel("Message Counts")
-    ax.set_title("Basic Real-Time Author Message Counts")
+    ax.set_xlabel("Words")
+    ax.set_ylabel("Counts")
+    ax.set_title("Real-Time Keyword Counts")
 
-    # Use the set_xticklabels() method to rotate the x-axis labels
-    # Pass in the x list, specify the rotation angle is 45 degrees,
-    # and align them to the right
-    # ha stands for horizontal alignment
-    ax.set_xticklabels(authors_list, rotation=45, ha="right")
+    ax.set_xticklabels(words_list, rotation=45, ha="right")
 
-    # Use the tight_layout() method to automatically adjust the padding
     plt.tight_layout()
-
-    # Draw the chart
     plt.draw()
-
-    # Pause briefly to allow some time for the chart to render
     plt.pause(0.01)
 
 
@@ -98,38 +85,21 @@ def update_chart():
 
 
 def process_message(message: str) -> None:
-    """
-    Process a single JSON message and update the chart.
-
-    Args:
-        message (str): The JSON message as a string.
-    """
     try:
-        # Log the raw message for debugging
         logger.debug(f"Raw message: {message}")
-
-        # Parse the JSON string into a Python dictionary
         message_dict: dict = json.loads(message)
-       
-        # Ensure the processed JSON is logged for debugging
         logger.info(f"Processed JSON message: {message_dict}")
 
-        # Ensure it's a dictionary before accessing fields
         if isinstance(message_dict, dict):
-            # Extract the 'author' field from the Python dictionary
-            author = message_dict.get("author", "unknown")
-            logger.info(f"Message received from author: {author}")
+            text = message_dict.get("message", "").lower()
 
-            # Increment the count for the author
-            author_counts[author] += 1
+            # Count occurrences of each tracked word
+            for word in tracked_words:
+                word_counts[word] += text.count(word)
 
-            # Log the updated counts
-            logger.info(f"Updated author counts: {dict(author_counts)}")
+            logger.info(f"Updated word counts: {dict(word_counts)}")
 
-            # Update the chart
             update_chart()
-
-            # Log the updated chart
             logger.info(f"Chart updated successfully for message: {message}")
 
         else:
