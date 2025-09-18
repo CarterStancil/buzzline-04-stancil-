@@ -290,3 +290,11 @@ Live Bar Chart (Kafka JSON streaming)
 Live Line Chart with Alert (Kafka CSV streaming)
 
 ![CSV (Kafka)](images/live_line_chart_example.jpg)
+
+
+## Update for Project 
+
+I will be insighting on how many times certain words are used in the message.
+I want to see the count of the word "app" and "movie" are used in the logged messages. 
+
+I will use a bar chart to visualize this. 
